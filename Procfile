@@ -1,1 +1,1 @@
-web: waitress-serve --call proxy:create_app
+web: waitress-serve --port=$PORT --call proxy:create_app
