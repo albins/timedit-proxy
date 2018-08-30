@@ -1,0 +1,7 @@
+- type: all-day
+  action: drop
+
+- name: ".*"
+  action: translate
+  translate:
+    name: "{{ name | regex_replace('.*, +(.*)\\. +, +(.*), (.*)', '\\\\1: \\\\2 (\\\\3)') }}"
