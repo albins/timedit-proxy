@@ -109,7 +109,7 @@ def create_app():
 
     @app.route("/calendar/<path:calendar_url>")
     def parse_calendar(calendar_url):
-        c = ics.Calendar(requests.get(URL).text)
+        c = ics.Calendar(requests.get(calendar_url).text)
         processed_calendar = apply_filters(c, app.config['filters'])
 
         response = flask.make_response(str(processed_calendar))
