@@ -44,7 +44,7 @@ def rule_to_transform_fn(rule):
         for field, template in templates.items():
             if not template:
                 continue
-            new_value = template.render(**event_to_params(new_event))
+            new_value = template.render(**event_to_params(event))
             setattr(new_event, field, new_value)
         return new_event
 

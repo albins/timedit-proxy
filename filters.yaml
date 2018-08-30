@@ -4,4 +4,11 @@
 - name: ".*"
   action: translate
   translate:
-    name: "{{ name | regex_replace('.*, +(.*)\\. +, +(.*), (.*)', '\\\\1: \\\\2 (\\\\3)') }}"
+    name: "{{ name | regex_replace('.*, +(.*)\\. +, +(.*), (.*)', '\\\\1: \\\\2') }}"
+    description: |
+      Pre-mangled name: {{ name }}
+
+      Lecturer: {{ name | regex_replace('.*, +(.*)\\. +, +(.*), (.*)', '\\3') }}
+      ----
+
+      {{ description }}
