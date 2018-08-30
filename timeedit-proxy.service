@@ -1,0 +1,10 @@
+[Unit]
+Description=TimeEdit Proxy
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/timeedit-proxy
+ExecStart=/home/pi/venv/timeedit-proxy/bin/waitress-serve --call proxy:create_app
+
+[Install]
+WantedBy=multi-user.target

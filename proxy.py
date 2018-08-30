@@ -7,10 +7,6 @@ import jinja2
 import requests
 import yaml
 
-URL = "https://cloud.timeedit.net/uu/web/schema/ri6XZ0g74560Y7QQ4YZ6800Y05y000Q6n5d51Q684v573ZQ0Z3Q5t134B4F981D24B00tD818C5DQ57E4A6909A03ZFE7.ics"
-
-NAME_TEMPLATE = "{{ name | regex_replace('.*, +(.*)\\. +, +(.*), (.*)', '\\\\1: \\\\2 (\\\\3)') }}"
-
 EVENT_FIELDS = ["location", "name", "description"]
 
 
@@ -44,7 +40,7 @@ def rule_to_transform_fn(rule):
     }
 
     def transform(event):
-        new_event = event
+        new_event = event.clone()
         for field, template in templates.items():
             if not template:
                 continue
@@ -108,17 +104,22 @@ def apply_filters(calendar, filters):
     return filtered_calendar
 
 
-def main():
-    c = ics.Calendar(requests.get(URL).text)
+def create_app():
+    app = flask.Flask(__name__)
+
+    @app.route("/calendar/<path:calendar_url>")
+    def parse_calendar(calendar_url):
+        c = ics.Calendar(requests.get(URL).text)
+        processed_calendar = apply_filters(c, app.config['filters'])
+
+        response = flask.make_response(str(processed_calendar))
+        response.headers[
+            "Content-Disposition"] = "attachment; filename=calendar.ics"
+        response.headers["Content-Type"] = "text/calendar"
+        return response
+
     with open("filters.yaml", "r") as f:
         rules = yaml.load(f)
 
-    filters = [rule_to_fn(rule) for rule in rules]
-
-    for event in apply_filters(c, filters).events:
-        print("{} in {} starts {}".format(event.name, event.location,
-                                          event.begin.humanize()))
-
-
-if __name__ == '__main__':
-    main()
+    app.config['filters'] = [rule_to_fn(rule) for rule in rules]
+    return app
